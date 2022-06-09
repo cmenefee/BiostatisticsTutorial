@@ -1,0 +1,74 @@
+---
+title: "Module 1 - Introduction to Statistics"
+output: html_notebook
+---
+
+So let's do an internet course; Academic Lesson's "Biostatistics Tutorial Full course for Beginners to Experts". But we'll use the data I've collected so far and if I need any more I'll download any missing dataset types described. 
+
+The first module is the introduction and only really gives definitions:
+
+![Module 1 Learning Objectives](http://kinokomori.info/Biostatistics%20Tutorial/Media/Screenshot_2022-06-09_09-37-11.png "Module 1 Learning Objectives")
+
+
+All of Which is all quite nice and defined as:
+
+**Statistical**
+
+  - Statistic: A characteristic that describes a sample
+  
+  - Parameter: A characteristic that describes a population
+ 
+  - Descriptive Statistics, describing and communicating information simply
+  
+  - Inferential Statistics, drawing conclusions from data and inferring
+  
+  - Population: A set of all individuals of interest
+
+  - Sample: A selection of individuals from a population
+  
+  - Variable: Characteristics that change across conditions 
+  
+  - Data: A collection of observations 
+  
+  - Datum: One observation of information
+  
+  - Sampling Error: The discrepancy between the true population parameter and the sample statistic
+
+
+**Research**
+
+  - Correlation Method, examines two variables as they exist naturally are observed to determine if relationships exist between them.
+  
+  - Experimental Method, demonstrates a cause and effect relationship between two variables
+  
+  - Quasi-Experimental Method: Non experimental study that examines pre-existing groups
+  
+  - Independent Variable: What is manipulated
+  
+  - Dependent Variable: What is measured
+  
+  - Quasi-Independent Variable: Observations that are inseparable from an individual and cannot reasonably be manipulated
+
+
+**Measurement**
+
+  - Discrete Variable: Can only take on whole numbers, no fractions of decimals
+  
+  - Continuous Variable: Has an infinite number of values between two values
+  
+  - Real Limits: Borders set on continuous variables
+  
+  - Upper Real Limit: the Real limit with the higher value
+  
+  - Ordinal Scale: Values are ordered by some measurement of magnitude
+  
+  - Lower Real Limit: the Real limit with the lower value
+  
+  - Interval Scale: Constitutes of ordered categories that are intervals of the same size
+  
+  - Nominal Scale: Values are categorized only by their names
+  
+  - Ration Scale: an interval scale with an absolute zero point that is meaningful
+
+
+All that said, all of this was r-notebooks' HTML. It's pretty easy enough to simply the copy and paste into the 'HTML' section on the WYSIWYG editor. 

@@ -1,0 +1,24 @@
+https://www.youtube.com/watch?v=1Q6_LRZwZrc
+
+
+Biostatistics are the development and application of statistical methods to a wide range of topics in biology. It encompasses the design of biological experiments, the collection and analysis of data from those experiments and the interpretation of the results.
+
+The following topics of #biostatistics have been discussed in this course
+⭐️ Table of Content ⭐️ 
+0:00 Module 1 - Introduction to Statistics
+29:13 Module 2 - Describing Data: Shape
+45:44 Module 3 - Describing Data: Central Tendency
+1:03:34 Module 4 - Describing Data: Variability
+1:34:51 Module 5 - Describing Data: Z-scores
+1:43:25 Module 6 - Probability (part I)
+2:09:21 Module 6 - Probability (part II)
+2:26:22 Module 7 - Distribution of Sample Means
+2:41:24 Module 9 - Estimation & Confidence Intervals & Effect Size
+2:56:59 Module 10 - Misleading with Statistics
+3:17:43 Module 11 - Biostatistics in Medical Decision-making
+4:13:36 Module 11b - Biostatistics in Medical Decision-Making: Clinical Application
+4:56:51 Module 12 - Biostatistics in Epidemiology
+5:05:16 Module 13 - Asking Questions: Research Study Design
+5:10:15 Module 14 - Bias & Confounders
+5:39:20 Module 16 - Correlation & Regression
+6:06:19 Module 17 - Non-parametric Tests
