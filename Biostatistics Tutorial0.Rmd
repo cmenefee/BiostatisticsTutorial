@@ -7,7 +7,7 @@ So let's do an internet course; Academic Lesson's "Biostatistics Tutorial Full c
 
 The first module is the introduction and only really gives definitions:
 
-![Module 1 Learning Objectives](http://kinokomori.info/Biostatistics%20Tutorial/Media/Screenshot_2022-06-09_09-37-11.png "Module 1 Learning Objectives")
+![Module 1 Learning Objectives](http://kinokomori.info/BiostatisticsTutorial/Media/Screenshot_2022-06-09_09-37-11.png "Module 1 Learning Objectives")
 
 
 All of Which is all quite nice and defined as:

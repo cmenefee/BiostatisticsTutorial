@@ -1,0 +1,181 @@
+---
+title: "Module 2 - Describing Data: Shape"
+output: html_notebook
+---
+
+
+```{r}
+# install.packages("RPostgreSQL")
+# install.packages("compare")
+# install.packages("moments")
+require("RPostgreSQL")
+require("compare")
+require("moments")
+```
+
+
+So this section is shape. 
+
+
+# Learning Objectives
+![Learning Objectives](http://kinokomori.info/BiostatisticsTutorial/Media/Screenshot_2022-06-10_09-39-47.png "Learning Objectives")
+
+
+# Outline 
+![Outline](http://kinokomori.info/BiostatisticsTutorial/Media/Screenshot_2022-06-10_09-41-07.png "Outline")
+ 
+
+ 
+ 
+# Statistical Notation
+
+N: The number of N in a population, n: the number of n in a sample
+
+
+# Organizing Data 
+
+## Frequency Distribution: 
+
+An Organized table of the number of scores located in each category on the measurement scale. The number of times each possible value of a variable occurs in a dataset.
+
+```{r}
+# Load the PostgreSQL driver, create a connection to the postgres database
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "smokyants", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM smokyants", sep="")
+smokyants <- data.frame(dbGetQuery(con, sql_string))
+dbDisconnect(con)
+
+doesit <- data.frame(c(rowSums(smokyants[5:42])), sort(smokyants$elevation_m))
+plot(doesit[,1]~doesit[,2], ylab="RowSum", xlab="Elevation", axes=FALSE, main = "Counts at Elevation")
+axis(1, sort(smokyants$elevation_m), las=2)
+axis(2, sort(rowSums(smokyants[5:42])), las=2)
+
+FileDirectory <- paste("/home/daiten/Programming/R/Projects/Biostatistics Tutorial/Media/", sep="")
+png(paste(FileDirectory, "AntFrequency.jpg", sep = ""), width = 1000, height = 500)
+plot(doesit[,1]~doesit[,2], ylab="RowSum", xlab="Elevation", axes=FALSE)
+axis(1, sort(smokyants$elevation_m), las=2)
+axis(2, sort(rowSums(smokyants[5:42])), las=2)
+
+dev.off()
+```
+
+## Cumulative Frequency Distribution: 
+Dissolved Nitrate over the course of a year or something.
+```{r}
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "cali_water", host = "localhost", port = 5432,user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM lab_results WHERE (units = 'mg/L' AND county_name = 'Alameda' AND parameter = 'Dissolved Nitrate')", sep="")
+Lab_results <- data.frame(dbGetQuery(con, sql_string))
+
+plot(na.omit(cumsum(Lab_results$result)), type="l", 
+     main = "Cumulative Dissolved Nitrate, Alameda", 
+     ylab = "mg/L",
+     xlab = paste("Number of samples from ", range(Lab_results$sample_date)[1], 
+                  " to ", range(Lab_results$sample_date)[2]))
+axis(1, range(Lab_results$sample_date))
+dbDisconnect(con, )
+```
+
+## Histogram/Bar Graph
+A graphical representation of a grouped frequency distribution with continuous classes. An approximate representation of the distribution of numerical data.
+```{r}
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "covertype", host = "localhost", port = 5432,user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM covertype", sep="")
+CoverType <- data.frame(dbGetQuery(con, sql_string))
+dbDisconnect(con)
+
+CoverTypes <- c("1. Spruce/Fir", "2. Lodgepole Pine", "3. Ponderosa Pine", "4. Cottonwood/Willow", "5. Aspen", "6. Douglas-fir", "7. Krummholz")
+hist(CoverType$cover_type, main = "Cover Type Representation", xlab = "Tree Type")
+legend("topright", CoverTypes)
+```
+
+
+
+## Pie Chart
+A circular statistical graphic, which is divided into slices to illustrate numerical proportion. In a pie chart, the arc length of each slice (and consequently its central angle and area) is proportional to the quantity it represents.
+```{r}
+CoverTypes <- c("1. Spruce/Fir", "2. Lodgepole Pine", "3. Ponderosa Pine", "4. Cottonwood/Willow", "5. Aspen", "6. Douglas-fir", "7. Krummholz")
+pie(table(CoverType$cover_type), labels = CoverTypes, main = "Cover Type Representation")
+# 
+# slices <- c(10, 12,4, 16, 8)
+# lbls <- c("US", "UK", "Australia", "Germany", "France")
+# pie(slices, labels = lbls, main="Pie Chart of Countries")
+
+```
+# Shape of a Distribution
+
+## Normal Distribution
+```{r}
+hist(rnorm(1000, mean = 70, sd = 10))
+
+x= rbeta(10000,5,5)
+hist(x, main="Symmetrical", freq=FALSE)
+lines(density(x), col='red', lwd=3)
+abline(v = c(mean(x),median(x)),  col=c("green", "red"), lty=c(2,2), lwd=c(3, 3))
+```
+
+
+
+## Skewed Distribution
+```{r}
+# https://stackoverflow.com/questions/28099590/create-sample-vector-data-in-r-with-a-skewed-distribution-with-limited-range
+# The beta distribution takes values from 0 to 1. If you want your values to be from 0 to 5 for instance, then you can multiply them by 5. Finally, you can get a "skewness" with the beta distribution. For example, for the skewness you can get these three types:
+# enter image description here
+# And using R and beta distribution you can get similar distributions as follows. Notice that the Green Vertical line refers to mean and the Red to median:
+
+x= rbeta(10000,5,2)
+hist(x, main="Negative or Left Skewness", freq=FALSE)
+lines(density(x), col='red', lwd=3)
+abline(v = c(mean(x),median(x)),  col=c("green", "red"), lty=c(2,2), lwd=c(3, 3))
+
+x= rbeta(10000,2,5)
+hist(x, main="Positive or Right Skewness", freq=FALSE)
+lines(density(x), col='red', lwd=3)
+abline(v = c(mean(x),median(x)),  col=c("green", "red"), lty=c(2,2), lwd=c(3, 3))
+
+set.seed(3)
+hist(sample(1:10, size = 100, replace = TRUE, prob = 10:1))
+```
+## Kurtosis
+
+Kurtosis is a statistical measure used to describe the degree to which scores cluster in the tails or the peak of a frequency distribution. The peak is the tallest part of the distribution, and the tails are the ends of the distribution. There are three types of kurtosis: mesokurtic, leptokurtic, and platykurtic. A measure of whether or not a distribution is heavy-tailed or light-tailed relative to a normal distribution.
+  
+ - Mesokurtic: Distributions that are moderate in breadth and curves with a medium peaked height.
+ - Leptokurtic: More values in the distribution tails and more values close to the mean (i.e. sharply peaked with heavy tails)
+ - Platykurtic: Fewer values in the tails and fewer values close to the mean (i.e. the curve has a flat peak and has more dispersed scores with lighter tails).
+ 
+The kurtosis of a normal distribution is 3.
+
+ - If a given distribution has a kurtosis less than 3, it is said to be playkurtic, which means it tends to produce fewer and less extreme outliers than the normal distribution.
+ - If a given distribution has a kurtosis greater than 3, it is said to be leptokurtic, which means it tends to produce more outliers than the normal distribution.
+  
+  
+```{r}  
+data = c(88, 95, 92, 97, 96, 97, 94, 86, 91, 95, 97, 88, 85, 76, 68)
+hist(data)
+
+#calculate skewness
+print(paste("Skewness: ", skewness(data)))
+
+#calculate kurtosis
+print(paste("Kurtosis: ", kurtosis(data)))
+```
+  
+  
+# Rank & Percentile
+ 
+## Percentiles
+
+A score below which a given percentage ("k") of scores in its frequency distribution falls (exclusive definition) or a score at or below which a given percentage falls (inclusive definition). 
+The value below which a percentage of data falls, a number where a certain percentage of scores fall below that number. 
+
+
+
+## Quantiles
+
+Cut points dividing the range of a probability distribution into continuous intervals with equal probabilities, or dividing the observations in a sample in the same way. Common quantiles have special names, such as quartiles (four groups), deciles (ten groups), and percentiles (100 groups). 
+The 25th percentile is also known as the first quartile (Q1), the 50th percentile as the median or second quartile (Q2), and the 75th percentile as the third quartile (Q3).
+
+![Key Terms](http://kinokomori.info/BiostatisticsTutorial/Media/Screenshot_2022-06-10_09-42-05.png "Key Terms")
