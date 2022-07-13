@@ -1,0 +1,87 @@
+---
+title: "Module 3 - Describing Data: Central Tendency"
+output: html_notebook
+---
+
+# Central Tendency
+Where the center is at, a statistical measure to determine a single value that defines the center of distribution. Often called averages.
+An attempt to find the single value that is most typical or representative of the entire group.
+```{r}
+
+# install.packages("RPostgreSQL")
+# install.packages("compare")
+# install.packages("moments")
+require("RPostgreSQL")
+require("compare")
+require("moments")
+
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "cali_water", host = "localhost", port = 5432,user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM lab_results WHERE (units = 'mg/L' AND county_name = 'Alameda' AND parameter = 'Dissolved Nitrate')", sep="")
+Lab_results <- data.frame(dbGetQuery(con, sql_string))
+
+dbDisconnect(con)
+```
+
+
+# The Mean
+The "true" mathematical/arithmetic "average" found by adding all numbers in the data set and then dividing by the number of values in the set. 
+```{r}
+# average nitrates level per test.
+# trim option
+mean(Lab_results$result, na.rm = TRUE)
+```
+
+# The Median
+The median the middle value when a data set is ordered from least to greatest. Appropriate for skewed/open-ended distributions and distributions with undetermined scores.
+
+Bimodel representations indicate that two distinct groups may exist in the same population.
+```{r}
+# Median nitrate levels
+median(Lab_results$result, na.rm = TRUE)
+```
+
+# The Mode
+The value that occurs most often. Best used for nominal or categorical data.å
+```{r}
+# One method
+# > mode()
+# EPA 300.0 28d Hold 
+#                764 
+mode <- function()
+  {
+    value <- (sort(-table(Lab_results$method_name))[1])
+    return(-value)
+  }
+ 
+
+mode()
+# Another Method
+# > find_mode(Lab_results$method_name)
+# [1] "EPA 300.0 28d Hold"
+find_mode <- function(x) 
+  {
+    u <- unique(x)
+    tab <- tabulate(match(x, u))
+    u[tab == max(tab)]
+  }
+
+find_mode(Lab_results$method_name)
+
+# The third method
+# > getMode(Lab_results$method_name)
+# [1] "EPA 300.0 28d Hold"
+getMode <- function(x) 
+  {
+    keys <- unique(x)
+    keys[which.max(tabulate(match(x, keys)))]
+  }
+
+getMode(Lab_results$method_name)
+
+# The fourth?
+# > names(table(Lab_results$method_name))[table(Lab_results$method_name)==max(table(Lab_results$method_name))]
+# [1] "EPA 300.0 28d Hold"
+names(table(Lab_results$method_name))[table(Lab_results$method_name)==max(table(Lab_results$method_name))]
+
+```
