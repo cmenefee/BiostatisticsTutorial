@@ -1,0 +1,199 @@
+---
+title: "Module 4 - Describing Data: Variability"
+output: html_notebook
+---
+
+
+# Variability 
+A statistical method to measure and objectively describe the differences that exist within a data set. Describes distribution along with shape and central tendency.
+
+There are three measures of variability; range, Interquartile Range, and Standard Deviation with Standard Deviation being hte most promenant.
+```{r}
+require("RPostgreSQL")
+# Load the PostgreSQL driver, create a connection to the postgres database
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "smokyants", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM smokyants", sep="")
+smokyants <- data.frame(dbGetQuery(con, sql_string))
+dbDisconnect(con)
+
+
+
+```
+
+
+# Range
+The distance between the largest and smallest scores in a distribution. 
+```{r}
+# One way:
+elevations <- data.frame(smokyants$elevation_m)
+range(elevations, na.rm = TRUE)
+
+# Another way:
+
+# multipleelevations1 <- smokyants[c(05,48)]
+# multipleelevations2 <- smokyants[c(10,48)]
+# multipleelevations3 <- smokyants[c(15,48)]
+
+multipleelevations1 <- subset(smokyants[c(05,48)], smokyants[5] != 0, na.rm = TRUE)
+multipleelevations2 <- subset(smokyants[c(10,48)], smokyants[10] != 0, na.rm = TRUE)
+multipleelevations3 <- subset(smokyants[c(15,48)], smokyants[15] != 0, na.rm = TRUE)
+
+range(multipleelevations1)
+range(multipleelevations2)
+range(multipleelevations3)
+
+# Another way:
+
+mutipleelevations <- c(multipleelevations1, multipleelevations2, multipleelevations3)
+sapply(mutipleelevations[c(2)], function(mutipleelevations){max(mutipleelevations, na.rm=TRUE) - min(mutipleelevations, na.rm=TRUE)})
+sapply(mutipleelevations[c(4)], function(mutipleelevations){max(mutipleelevations, na.rm=TRUE) - min(mutipleelevations, na.rm=TRUE)})
+sapply(mutipleelevations[c(6)], function(mutipleelevations){max(mutipleelevations, na.rm=TRUE) - min(mutipleelevations, na.rm=TRUE)})
+
+
+
+```
+
+
+# Interquartile Range
+
+An observation variable that is the difference between its upper and lower quartiles. It is a measure of how far apart the middle portion of data spreads in value.
+```{r}
+#One way
+summary(smokyants$elevation_m)
+print(paste("Elevation IQR: ", IQR(smokyants$elevation_m)))
+
+fiveantselevations <- c(subset(smokyants$elevation_m, smokyants[5] != 0))
+print(paste("stigmatomma_pallipes elevation IQR: ", IQR(fiveantselevations))) # stigmatomma_pallipes
+
+teneantselevations <- c(subset(smokyants$elevation_m, smokyants[10] != 0))
+print(paste("camponotus_pennsylvanicus elevation IQR: ", IQR(teneantselevations))) # camponotus_pennsylvanicus
+
+twentyantselevations <- c(subset(smokyants$elevation_m, smokyants[15] != 0))
+print(paste("crematogaster_minutissima elevation IQR: ", IQR(twentyantselevations))) # crematogaster_minutissima
+
+#Another way
+mutipleelevations <- c(multipleelevations1, multipleelevations2, multipleelevations3)
+sapply(mutipleelevations[c(2, 4, 6)], IQR)
+```
+
+
+# Standard Deviation:
+
+The measure that is used to quantify the amount of variation or dispersion of a set of data values
+```{r}
+# install.packages("RPostgreSQL")
+require("RPostgreSQL")
+
+# Load the PostgreSQL driver, create a connection to the postgres database
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "nitrofungi", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+
+# sequencing_sql_string <- paste("SELECT * FROM sequencing", sep="")
+# sequencing <- data.frame(dbGetQuery(con, sequencing_sql_string))
+
+greenhouse_sql_string <- paste("SELECT * FROM greenhouse", sep="")
+greenhouse <- data.frame(dbGetQuery(con, greenhouse_sql_string))
+
+dbDisconnect(con)
+
+unique(greenhouse$species)
+
+e_globulus <- subset(greenhouse, greenhouse$species == "E. globulus")
+
+colnames(e_globulus)
+unique(greenhouse$nitrogen)
+
+low_nitrogen <- subset(e_globulus, greenhouse$nitrogen == "low N")
+high_nitrogen <- subset(e_globulus, greenhouse$nitrogen == "high N")
+
+SD_e_globulusSD_low <- sd(low_nitrogen$biomass, na.rm = TRUE)
+SD_e_globulusSD_high <- sd(high_nitrogen$biomass, na.rm = TRUE)
+
+SD_e_globulusSD_low
+SD_e_globulusSD_high
+
+plot(e_globulus$biomass)
+plot(subset(e_globulus$biomass, e_globulus$nitrogen == "low N"), main = "Biomass for e_globulus low nitrogen")
+plot(subset(e_globulus$biomass, e_globulus$nitrogen == "high N"), main = "Biomass for e_globulus high nitrogen")
+```
+
+
+# Visual Displays of Variability: Error Bars
+```{r}
+#Think these a scientificlly wrong tbh....
+e_globulus <- subset(greenhouse, greenhouse$species == "E. globulus")
+FileDirectory <- paste("/home/daiten/Programming/R/Projects/Biostatistics Tutorial/Media/", sep="")
+
+#Let's create the working vector
+biomasses <- c()
+
+#Let's create a function to apply the error bars
+error.bar <- function(x, y, upper, lower=upper, length=0.1,...)
+  {
+    arrows(x,upper, x, y, angle=90, code=3, length=length, ...)
+  }
+
+# Let's fill a vector with the mean, min, max. Kinda like a box plot but not a box plot
+# (It's a box plot.......)
+for(i in 1:4)
+  {
+    biomasses <- rbind(biomasses, c(mean(subset(e_globulus$biomass, e_globulus$block == i)),
+    min(subset(e_globulus$biomass, e_globulus$block == i)),
+    max(subset(e_globulus$biomass, e_globulus$block == i))))
+  }
+
+#Generate inline Image:
+#Generate the plot, call the function to apply the error bars
+biomassplot <- barplot(biomasses[,1], ylim = c(0,max(biomasses[,3])))
+error.bar(biomassplot, biomasses[,2], biomasses[,3])
+
+#Generate image file
+png(paste(FileDirectory, "ArrowBars.jpg", sep = ""), width = 1000, height = 1000)
+biomassplot <- barplot(biomasses[,1], ylim = c(0,max(biomasses[,3])))
+error.bar(biomassplot, biomasses[,2], biomasses[,3])
+dev.off()
+```
+
+
+
+# Visual Displays of Variability: Box Plot
+```{r}
+e_globulus <- subset(greenhouse, greenhouse$species == "E. globulus")
+
+block1 <- subset(e_globulus, e_globulus$block == "1")
+block2 <- subset(e_globulus, e_globulus$block == "2")
+block3 <- subset(e_globulus, e_globulus$block == "3")
+block4 <- subset(e_globulus, e_globulus$block == "4")
+
+#BoxPlots
+
+par(mfrow = c(2,2))
+boxplot(subset(block1$height, block1$soil == "control"), main="Block 1, heights - control group")
+boxplot(subset(block2$height, block2$soil == "control"), main="Block 2, heights - control group")
+boxplot(subset(block3$height, block3$soil == "control"), main="Block 3, heights - control group")
+boxplot(subset(block4$height, block4$soil == "control"), main="Block 4, heights - control group")
+
+par(mfrow = c(2,2))
+boxplot(subset(block1$height, block1$soil == "conspecific"), main="Block 1, heights - conspecific group")
+boxplot(subset(block2$height, block2$soil == "conspecific"), main="Block 2, heights - conspecific group")
+boxplot(subset(block3$height, block3$soil == "conspecific"), main="Block 3, heights - conspecific group")
+boxplot(subset(block4$height, block4$soil == "conspecific"), main="Block 4, heights - conspecific group")
+
+# Biomass in control and conspecific groups
+par(mfrow = c(2,2))
+boxplot(subset(block1$biomass, block1$soil == "control"), main="Block 1, Biomass - control group")
+boxplot(subset(block2$biomass, block2$soil == "control"), main="Block 2, Biomass - control group")
+boxplot(subset(block3$biomass, block3$soil == "control"), main="Block 3, Biomass - control group")
+boxplot(subset(block4$biomass, block4$soil == "control"), main="Block 4, Biomass - control group")
+
+par(mfrow = c(2,2))
+boxplot(subset(block1$biomass, block1$soil == "conspecific"), main="Block 1, Biomass - conspecific group")
+boxplot(subset(block2$biomass, block2$soil == "conspecific"), main="Block 2, Biomass - conspecific group")
+boxplot(subset(block3$biomass, block3$soil == "conspecific"), main="Block 3, Biomass - conspecific group")
+boxplot(subset(block4$biomass, block4$soil == "conspecific"), main="Block 4, Biomass - conspecific group")
+```
+
+
+
+
