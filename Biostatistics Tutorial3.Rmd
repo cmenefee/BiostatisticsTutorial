@@ -3,7 +3,6 @@ title: "Module 4 - Describing Data: Variability"
 output: html_notebook
 ---
 
-
 # Variability 
 A statistical method to measure and objectively describe the differences that exist within a data set. Describes distribution along with shape and central tendency.
 
@@ -16,9 +15,6 @@ con <- dbConnect(drv, dbname = "smokyants", host = "localhost", port = 5432, use
 sql_string <- paste("SELECT * FROM smokyants", sep="")
 smokyants <- data.frame(dbGetQuery(con, sql_string))
 dbDisconnect(con)
-
-
-
 ```
 
 
@@ -30,11 +26,6 @@ elevations <- data.frame(smokyants$elevation_m)
 range(elevations, na.rm = TRUE)
 
 # Another way:
-
-# multipleelevations1 <- smokyants[c(05,48)]
-# multipleelevations2 <- smokyants[c(10,48)]
-# multipleelevations3 <- smokyants[c(15,48)]
-
 multipleelevations1 <- subset(smokyants[c(05,48)], smokyants[5] != 0, na.rm = TRUE)
 multipleelevations2 <- subset(smokyants[c(10,48)], smokyants[10] != 0, na.rm = TRUE)
 multipleelevations3 <- subset(smokyants[c(15,48)], smokyants[15] != 0, na.rm = TRUE)
@@ -44,14 +35,10 @@ range(multipleelevations2)
 range(multipleelevations3)
 
 # Another way:
-
 mutipleelevations <- c(multipleelevations1, multipleelevations2, multipleelevations3)
 sapply(mutipleelevations[c(2)], function(mutipleelevations){max(mutipleelevations, na.rm=TRUE) - min(mutipleelevations, na.rm=TRUE)})
 sapply(mutipleelevations[c(4)], function(mutipleelevations){max(mutipleelevations, na.rm=TRUE) - min(mutipleelevations, na.rm=TRUE)})
 sapply(mutipleelevations[c(6)], function(mutipleelevations){max(mutipleelevations, na.rm=TRUE) - min(mutipleelevations, na.rm=TRUE)})
-
-
-
 ```
 
 
@@ -88,9 +75,6 @@ require("RPostgreSQL")
 # Load the PostgreSQL driver, create a connection to the postgres database
 drv <- dbDriver("PostgreSQL")
 con <- dbConnect(drv, dbname = "nitrofungi", host = "localhost", port = 5432, user = "ruser", password = "ruser")
-
-# sequencing_sql_string <- paste("SELECT * FROM sequencing", sep="")
-# sequencing <- data.frame(dbGetQuery(con, sequencing_sql_string))
 
 greenhouse_sql_string <- paste("SELECT * FROM greenhouse", sep="")
 greenhouse <- data.frame(dbGetQuery(con, greenhouse_sql_string))
@@ -145,12 +129,12 @@ for(i in 1:4)
 
 #Generate inline Image:
 #Generate the plot, call the function to apply the error bars
-biomassplot <- barplot(biomasses[,1], ylim = c(0,max(biomasses[,3])))
+biomassplot <- barplot(biomasses[,1], ylim = c(0,max(biomasses[,3]+5)), main = "Bar is mean, bottom is min value, top is max value.")
 error.bar(biomassplot, biomasses[,2], biomasses[,3])
 
 #Generate image file
 png(paste(FileDirectory, "ArrowBars.jpg", sep = ""), width = 1000, height = 1000)
-biomassplot <- barplot(biomasses[,1], ylim = c(0,max(biomasses[,3])))
+biomassplot <- barplot(biomasses[,1], ylim = c(0,max(biomasses[,3])), main = "BioMass. Bar is mean, bottom is min value, top is max value.")
 error.bar(biomassplot, biomasses[,2], biomasses[,3])
 dev.off()
 ```
@@ -167,7 +151,6 @@ block3 <- subset(e_globulus, e_globulus$block == "3")
 block4 <- subset(e_globulus, e_globulus$block == "4")
 
 #BoxPlots
-
 par(mfrow = c(2,2))
 boxplot(subset(block1$height, block1$soil == "control"), main="Block 1, heights - control group")
 boxplot(subset(block2$height, block2$soil == "control"), main="Block 2, heights - control group")
