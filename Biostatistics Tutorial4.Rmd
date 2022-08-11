@@ -3,3 +3,64 @@ title: "Module 5 - Describing Data: Z-scores"
 output: html_notebook
 ---
 
+A Z-score is a numerical measurement that describes a datapoint's relationship to the mean of a group of values.
+  - Tells us exactly where the original scores are located. Allows us to standardize an entire distribution.
+  - Gives you an idea of how far from the mean a data point is. 
+  - Describes the position of a raw score in terms of its distance from the mean, when measured in standard deviation units. The z-score is positive if the value lies above the mean, and negative if it lies below the mean.
+  - Scores that have been given a common standard. This standard is a mean of zero and a standard deviation of 1.
+  - A measure that shows how much away (below or above) of the mean is a specific value (individual) in a given dataset. 
+  - The closer to zero the closer the datapoint is to the mean.
+  
+(datapoint-dataset_mean)/dataset_standard.deviation
+  
+Simple enough....
+So let's try out the nitrate levels in the water in Alameda. 
+  
+```{r}
+require("RPostgreSQL")
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "cali_water", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM lab_results WHERE (units = 'mg/L' AND county_name = 'Alameda' AND parameter LIKE '%Dissolved%')", sep="")
+Lab_results <- data.frame(dbGetQuery(con, sql_string))  
+
+con <- dbDisconnect(con)
+rm(con)
+
+nitrates <- subset(Lab_results, Lab_results$parameter == "Dissolved Nitrate")
+nitratemean <- mean(nitrates$result, na.rm = TRUE)
+nitratesd <- sd(nitrates$result, na.rm = TRUE)
+
+# Mean:
+print(paste("The mean for nitrates is: ", nitratemean))
+
+# Standard Deviation
+print(paste("The standard deviation for nitrates is: ", nitratesd))
+
+# 1967-09-26 00:00:00, Dissolved Nitrate: 406
+# Larget vallue in the dataset, the value furthest away from the mean, returns a "score" of 24.
+nitrateballZ <- (406 - nitratemean)/nitratesd
+print(paste("The z-score with a value of 406: ", nitrateballZ))
+
+# 2019-12-17 12:50:00, Dissolved Nitrate: 3.47
+# Arbitrary date 1, bellow the mean of 6.100934 so returns a "score" of -0.1644175
+nitrateballZ <- (3.47 - nitratemean)/nitratesd
+print(paste("The z-score with a value of 3.47: ", nitrateballZ))
+
+# 1950-09-20 12:45:00, 15.0
+# Arbitrary date 2, above 6.100934 and returns 0.556138. 
+nitrateballZ <- (15.0 - nitratemean)/nitratesd
+print(paste("The z-score with a value of 15.0: ", nitrateballZ))
+
+# 2005-03-15 11:20:00, 0.80
+# Arbitrary date 3, bellow the mean that returns -0.3312764
+nitrateballZ <- (0.80 - nitratemean)/nitratesd
+print(paste("The z-score with a value of 0.80: ", nitrateballZ))
+
+# And a zero value just to see: -0.3812716.
+nitrateballZ <- (0 - nitratemean)/nitratesd
+print(paste("The z-score with a value of zero: ", nitrateballZ))
+
+# What about negative nitrates?
+nitrateballZ <- (-2 - nitratemean)/nitratesd
+print(paste("The z-score with a value of -2: ", nitrateballZ))
+```

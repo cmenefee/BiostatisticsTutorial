@@ -1766,9 +1766,105 @@ pre code {
 
 
 <!-- rnb-text-begin -->
+<p>A Z-score is a numerical measurement that describes a datapoint’s
+relationship to the mean of a group of values. - Tells us exactly where
+the original scores are located. Allows us to standardize an entire
+distribution. - Gives you an idea of how far from the mean a data point
+is. - Describes the position of a raw score in terms of its distance
+from the mean, when measured in standard deviation units. The z-score is
+positive if the value lies above the mean, and negative if it lies below
+the mean. - Scores that have been given a common standard. This standard
+is a mean of zero and a standard deviation of 1. - A measure that shows
+how much away (below or above) of the mean is a specific value
+(individual) in a given dataset. - The closer to zero the closer the
+datapoint is to the mean.</p>
+<p>(datapoint-dataset_mean)/dataset_standard.deviation</p>
+<p>Simple enough…. So let’s try out the nitrate levels in the water in
+Alameda.</p>
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVxdWlyZShcIlJQb3N0Z3JlU1FMXCIpXG5kcnYgPC0gZGJEcml2ZXIoXCJQb3N0Z3JlU1FMXCIpXG5jb24gPC0gZGJDb25uZWN0KGRydiwgZGJuYW1lID0gXCJjYWxpX3dhdGVyXCIsIGhvc3QgPSBcImxvY2FsaG9zdFwiLCBwb3J0ID0gNTQzMiwgdXNlciA9IFwicnVzZXJcIiwgcGFzc3dvcmQgPSBcInJ1c2VyXCIpXG5zcWxfc3RyaW5nIDwtIHBhc3RlKFwiU0VMRUNUICogRlJPTSBsYWJfcmVzdWx0cyBXSEVSRSAodW5pdHMgPSAnbWcvTCcgQU5EIGNvdW50eV9uYW1lID0gJ0FsYW1lZGEnIEFORCBwYXJhbWV0ZXIgTElLRSAnJURpc3NvbHZlZCUnKVwiLCBzZXA9XCJcIilcbkxhYl9yZXN1bHRzIDwtIGRhdGEuZnJhbWUoZGJHZXRRdWVyeShjb24sIHNxbF9zdHJpbmcpKSAgXG5cbmNvbiA8LSBkYkRpc2Nvbm5lY3QoY29uKVxucm0oY29uKVxuXG5uaXRyYXRlcyA8LSBzdWJzZXQoTGFiX3Jlc3VsdHMsIExhYl9yZXN1bHRzJHBhcmFtZXRlciA9PSBcIkRpc3NvbHZlZCBOaXRyYXRlXCIpXG5uaXRyYXRlbWVhbiA8LSBtZWFuKG5pdHJhdGVzJHJlc3VsdCwgbmEucm0gPSBUUlVFKVxubml0cmF0ZXNkIDwtIHNkKG5pdHJhdGVzJHJlc3VsdCwgbmEucm0gPSBUUlVFKVxuXG4jIE1lYW46XG5wcmludChwYXN0ZShcIlRoZSBtZWFuIGZvciBuaXRyYXRlcyBpczogXCIsIG5pdHJhdGVtZWFuKSlcbmBgYCJ9 -->
+<pre class="r"><code>require(&quot;RPostgreSQL&quot;)
+drv &lt;- dbDriver(&quot;PostgreSQL&quot;)
+con &lt;- dbConnect(drv, dbname = &quot;cali_water&quot;, host = &quot;localhost&quot;, port = 5432, user = &quot;ruser&quot;, password = &quot;ruser&quot;)
+sql_string &lt;- paste(&quot;SELECT * FROM lab_results WHERE (units = &#39;mg/L&#39; AND county_name = &#39;Alameda&#39; AND parameter LIKE &#39;%Dissolved%&#39;)&quot;, sep=&quot;&quot;)
+Lab_results &lt;- data.frame(dbGetQuery(con, sql_string))  
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiTW9kdWxlIDUgLSBEZXNjcmliaW5nIERhdGE6IFotc2NvcmVzIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgo=</div>
+con &lt;- dbDisconnect(con)
+rm(con)
+
+nitrates &lt;- subset(Lab_results, Lab_results$parameter == &quot;Dissolved Nitrate&quot;)
+nitratemean &lt;- mean(nitrates$result, na.rm = TRUE)
+nitratesd &lt;- sd(nitrates$result, na.rm = TRUE)
+
+# Mean:
+print(paste(&quot;The mean for nitrates is: &quot;, nitratemean))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIG1lYW4gZm9yIG5pdHJhdGVzIGlzOiAgNi4xMDA5MzM5Mjc0NzM4OFwiXG4ifQ== -->
+<pre><code>[1] &quot;The mean for nitrates is:  6.10093392747388&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBTdGFuZGFyZCBEZXZpYXRpb25cbnByaW50KHBhc3RlKFwiVGhlIHN0YW5kYXJkIGRldmlhdGlvbiBmb3Igbml0cmF0ZXMgaXM6IFwiLCBuaXRyYXRlc2QpKVxuYGBgIn0= -->
+<pre class="r"><code># Standard Deviation
+print(paste(&quot;The standard deviation for nitrates is: &quot;, nitratesd))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIHN0YW5kYXJkIGRldmlhdGlvbiBmb3Igbml0cmF0ZXMgaXM6ICAxNi4wMDE1NDM1MTYzMzg3XCJcbiJ9 -->
+<pre><code>[1] &quot;The standard deviation for nitrates is:  16.0015435163387&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyAxOTY3LTA5LTI2IDAwOjAwOjAwLCBEaXNzb2x2ZWQgTml0cmF0ZTogNDA2XG4jIExhcmdldCB2YWxsdWUgaW4gdGhlIGRhdGFzZXQsIHRoZSB2YWx1ZSBmdXJ0aGVzdCBhd2F5IGZyb20gdGhlIG1lYW4sIHJldHVybnMgYSBcInNjb3JlXCIgb2YgMjQuXG5uaXRyYXRlYmFsbFogPC0gKDQwNiAtIG5pdHJhdGVtZWFuKS9uaXRyYXRlc2RcbnByaW50KHBhc3RlKFwiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIDQwNiBpczogXCIsIG5pdHJhdGViYWxsWikpXG5gYGAifQ== -->
+<pre class="r"><code># 1967-09-26 00:00:00, Dissolved Nitrate: 406
+# Larget vallue in the dataset, the value furthest away from the mean, returns a &quot;score&quot; of 24.
+nitrateballZ &lt;- (406 - nitratemean)/nitratesd
+print(paste(&quot;The z-score with a value of 406 is: &quot;, nitrateballZ))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIDQwNiBpczogIDI0Ljk5MTI4MDcyNjRcIlxuIn0= -->
+<pre><code>[1] &quot;The z-score with a value of 406 is:  24.9912807264&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyAyMDE5LTEyLTE3IDEyOjUwOjAwLCBEaXNzb2x2ZWQgTml0cmF0ZTogMy40N1xuIyBBcmJpdHJhcnkgZGF0ZSAxLCBiZWxsb3cgdGhlIG1lYW4gb2YgNi4xMDA5MzQgc28gcmV0dXJucyBhIFwic2NvcmVcIiBvZiAtMC4xNjQ0MTc1XG5uaXRyYXRlYmFsbFogPC0gKDMuNDcgLSBuaXRyYXRlbWVhbikvbml0cmF0ZXNkXG5wcmludChwYXN0ZShcIlRoZSB6LXNjb3JlIHdpdGggYSB2YWx1ZSBvZiAzLjQ3OiBcIiwgbml0cmF0ZWJhbGxaKSlcbmBgYCJ9 -->
+<pre class="r"><code># 2019-12-17 12:50:00, Dissolved Nitrate: 3.47
+# Arbitrary date 1, bellow the mean of 6.100934 so returns a &quot;score&quot; of -0.1644175
+nitrateballZ &lt;- (3.47 - nitratemean)/nitratesd
+print(paste(&quot;The z-score with a value of 3.47: &quot;, nitrateballZ))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIDMuNDc6ICAtMC4xNjQ0MTc1MDkxNDc2MzRcIlxuIn0= -->
+<pre><code>[1] &quot;The z-score with a value of 3.47:  -0.164417509147634&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyAxOTUwLTA5LTIwIDEyOjQ1OjAwLCAxNS4wXG4jIEFyYml0cmFyeSBkYXRlIDIsIGFib3ZlIDYuMTAwOTM0IGFuZCByZXR1cm5zIDAuNTU2MTM4LiBUaGUgY2xvc2VyIHRvIHplcm8gdGhlIGNsb3NlciB0aGUgZGF0YXBvaW50IGlzIHRvIHRoZSBtZWFuLlxubml0cmF0ZWJhbGxaIDwtICgxNS4wIC0gbml0cmF0ZW1lYW4pL25pdHJhdGVzZFxucHJpbnQocGFzdGUoXCJUaGUgei1zY29yZSB3aXRoIGEgdmFsdWUgb2YgMTUuMDogXCIsIG5pdHJhdGViYWxsWikpXG5gYGAifQ== -->
+<pre class="r"><code># 1950-09-20 12:45:00, 15.0
+# Arbitrary date 2, above 6.100934 and returns 0.556138. The closer to zero the closer the datapoint is to the mean.
+nitrateballZ &lt;- (15.0 - nitratemean)/nitratesd
+print(paste(&quot;The z-score with a value of 15.0: &quot;, nitrateballZ))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIDE1LjA6ICAwLjU1NjEzNzk3OTAyOTMwN1wiXG4ifQ== -->
+<pre><code>[1] &quot;The z-score with a value of 15.0:  0.556137979029307&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyAyMDA1LTAzLTE1IDExOjIwOjAwLCAwLjgwXG4jIEFyYml0cmFyeSBkYXRlIDMsIGJlbGxvdyB0aGUgbWVhbiB0aGF0IHJldHVybnMgLTAuMzMxMjc2NFxubml0cmF0ZWJhbGxaIDwtICgwLjgwIC0gbml0cmF0ZW1lYW4pL25pdHJhdGVzZFxucHJpbnQocGFzdGUoXCJUaGUgei1zY29yZSB3aXRoIGEgdmFsdWUgb2YgMC44MDogXCIsIG5pdHJhdGViYWxsWikpXG5gYGAifQ== -->
+<pre class="r"><code># 2005-03-15 11:20:00, 0.80
+# Arbitrary date 3, bellow the mean that returns -0.3312764
+nitrateballZ &lt;- (0.80 - nitratemean)/nitratesd
+print(paste(&quot;The z-score with a value of 0.80: &quot;, nitrateballZ))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIDAuODA6ICAtMC4zMzEyNzY0MTIzMDc0MjhcIlxuIn0= -->
+<pre><code>[1] &quot;The z-score with a value of 0.80:  -0.331276412307428&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBBbmQgYSB6ZXJvIHZhbHVlIGp1c3QgdG8gc2VlOiAtMC4zODEyNzE2Llxubml0cmF0ZWJhbGxaIDwtICgwIC0gbml0cmF0ZW1lYW4pL25pdHJhdGVzZFxucHJpbnQocGFzdGUoXCJUaGUgei1zY29yZSB3aXRoIGEgdmFsdWUgb2YgemVybzogXCIsIG5pdHJhdGViYWxsWikpXG5gYGAifQ== -->
+<pre class="r"><code># And a zero value just to see: -0.3812716.
+nitrateballZ &lt;- (0 - nitratemean)/nitratesd
+print(paste(&quot;The z-score with a value of zero: &quot;, nitrateballZ))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIHplcm86ICAtMC4zODEyNzE1ODkyODQxNDZcIlxuIn0= -->
+<pre><code>[1] &quot;The z-score with a value of zero:  -0.381271589284146&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBXaGF0IGFib3V0IG5lZ2F0aXZlIG5pdHJhdGVzP1xubml0cmF0ZWJhbGxaIDwtICgtMiAtIG5pdHJhdGVtZWFuKS9uaXRyYXRlc2RcbnByaW50KHBhc3RlKFwiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIC0yOiBcIiwgbml0cmF0ZWJhbGxaKSlcbmBgYCJ9 -->
+<pre class="r"><code># What about negative nitrates?
+nitrateballZ &lt;- (-2 - nitratemean)/nitratesd
+print(paste(&quot;The z-score with a value of -2: &quot;, nitrateballZ))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIC0yOiAgLTAuNTA2MjU5NTMxNzI1OTRcIlxuIn0= -->
+<pre><code>[1] &quot;The z-score with a value of -2:  -0.50625953172594&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiTW9kdWxlIDUgLSBEZXNjcmliaW5nIERhdGE6IFotc2NvcmVzIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpBIFotc2NvcmUgaXMgYSBudW1lcmljYWwgbWVhc3VyZW1lbnQgdGhhdCBkZXNjcmliZXMgYSBkYXRhcG9pbnQncyByZWxhdGlvbnNoaXAgdG8gdGhlIG1lYW4gb2YgYSBncm91cCBvZiB2YWx1ZXMuCiAgLSBUZWxscyB1cyBleGFjdGx5IHdoZXJlIHRoZSBvcmlnaW5hbCBzY29yZXMgYXJlIGxvY2F0ZWQuIEFsbG93cyB1cyB0byBzdGFuZGFyZGl6ZSBhbiBlbnRpcmUgZGlzdHJpYnV0aW9uLgogIC0gR2l2ZXMgeW91IGFuIGlkZWEgb2YgaG93IGZhciBmcm9tIHRoZSBtZWFuIGEgZGF0YSBwb2ludCBpcy4gCiAgLSBEZXNjcmliZXMgdGhlIHBvc2l0aW9uIG9mIGEgcmF3IHNjb3JlIGluIHRlcm1zIG9mIGl0cyBkaXN0YW5jZSBmcm9tIHRoZSBtZWFuLCB3aGVuIG1lYXN1cmVkIGluIHN0YW5kYXJkIGRldmlhdGlvbiB1bml0cy4gVGhlIHotc2NvcmUgaXMgcG9zaXRpdmUgaWYgdGhlIHZhbHVlIGxpZXMgYWJvdmUgdGhlIG1lYW4sIGFuZCBuZWdhdGl2ZSBpZiBpdCBsaWVzIGJlbG93IHRoZSBtZWFuLgogIC0gU2NvcmVzIHRoYXQgaGF2ZSBiZWVuIGdpdmVuIGEgY29tbW9uIHN0YW5kYXJkLiBUaGlzIHN0YW5kYXJkIGlzIGEgbWVhbiBvZiB6ZXJvIGFuZCBhIHN0YW5kYXJkIGRldmlhdGlvbiBvZiAxLgogIC0gQSBtZWFzdXJlIHRoYXQgc2hvd3MgaG93IG11Y2ggYXdheSAoYmVsb3cgb3IgYWJvdmUpIG9mIHRoZSBtZWFuIGlzIGEgc3BlY2lmaWMgdmFsdWUgKGluZGl2aWR1YWwpIGluIGEgZ2l2ZW4gZGF0YXNldC4gCiAgLSBUaGUgY2xvc2VyIHRvIHplcm8gdGhlIGNsb3NlciB0aGUgZGF0YXBvaW50IGlzIHRvIHRoZSBtZWFuLgogIAooZGF0YXBvaW50LWRhdGFzZXRfbWVhbikvZGF0YXNldF9zdGFuZGFyZC5kZXZpYXRpb24KICAKU2ltcGxlIGVub3VnaC4uLi4KU28gbGV0J3MgdHJ5IG91dCB0aGUgbml0cmF0ZSBsZXZlbHMgaW4gdGhlIHdhdGVyIGluIEFsYW1lZGEuIAogIApgYGB7cn0KcmVxdWlyZSgiUlBvc3RncmVTUUwiKQpkcnYgPC0gZGJEcml2ZXIoIlBvc3RncmVTUUwiKQpjb24gPC0gZGJDb25uZWN0KGRydiwgZGJuYW1lID0gImNhbGlfd2F0ZXIiLCBob3N0ID0gImxvY2FsaG9zdCIsIHBvcnQgPSA1NDMyLCB1c2VyID0gInJ1c2VyIiwgcGFzc3dvcmQgPSAicnVzZXIiKQpzcWxfc3RyaW5nIDwtIHBhc3RlKCJTRUxFQ1QgKiBGUk9NIGxhYl9yZXN1bHRzIFdIRVJFICh1bml0cyA9ICdtZy9MJyBBTkQgY291bnR5X25hbWUgPSAnQWxhbWVkYScgQU5EIHBhcmFtZXRlciBMSUtFICclRGlzc29sdmVkJScpIiwgc2VwPSIiKQpMYWJfcmVzdWx0cyA8LSBkYXRhLmZyYW1lKGRiR2V0UXVlcnkoY29uLCBzcWxfc3RyaW5nKSkgIAoKY29uIDwtIGRiRGlzY29ubmVjdChjb24pCnJtKGNvbikKCm5pdHJhdGVzIDwtIHN1YnNldChMYWJfcmVzdWx0cywgTGFiX3Jlc3VsdHMkcGFyYW1ldGVyID09ICJEaXNzb2x2ZWQgTml0cmF0ZSIpCm5pdHJhdGVtZWFuIDwtIG1lYW4obml0cmF0ZXMkcmVzdWx0LCBuYS5ybSA9IFRSVUUpCm5pdHJhdGVzZCA8LSBzZChuaXRyYXRlcyRyZXN1bHQsIG5hLnJtID0gVFJVRSkKCiMgTWVhbjoKcHJpbnQocGFzdGUoIlRoZSBtZWFuIGZvciBuaXRyYXRlcyBpczogIiwgbml0cmF0ZW1lYW4pKQoKIyBTdGFuZGFyZCBEZXZpYXRpb24KcHJpbnQocGFzdGUoIlRoZSBzdGFuZGFyZCBkZXZpYXRpb24gZm9yIG5pdHJhdGVzIGlzOiAiLCBuaXRyYXRlc2QpKQoKIyAxOTY3LTA5LTI2IDAwOjAwOjAwLCBEaXNzb2x2ZWQgTml0cmF0ZTogNDA2CiMgTGFyZ2V0IHZhbGx1ZSBpbiB0aGUgZGF0YXNldCwgdGhlIHZhbHVlIGZ1cnRoZXN0IGF3YXkgZnJvbSB0aGUgbWVhbiwgcmV0dXJucyBhICJzY29yZSIgb2YgMjQuCm5pdHJhdGViYWxsWiA8LSAoNDA2IC0gbml0cmF0ZW1lYW4pL25pdHJhdGVzZApwcmludChwYXN0ZSgiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIDQwNjogIiwgbml0cmF0ZWJhbGxaKSkKCiMgMjAxOS0xMi0xNyAxMjo1MDowMCwgRGlzc29sdmVkIE5pdHJhdGU6IDMuNDcKIyBBcmJpdHJhcnkgZGF0ZSAxLCBiZWxsb3cgdGhlIG1lYW4gb2YgNi4xMDA5MzQgc28gcmV0dXJucyBhICJzY29yZSIgb2YgLTAuMTY0NDE3NQpuaXRyYXRlYmFsbFogPC0gKDMuNDcgLSBuaXRyYXRlbWVhbikvbml0cmF0ZXNkCnByaW50KHBhc3RlKCJUaGUgei1zY29yZSB3aXRoIGEgdmFsdWUgb2YgMy40NzogIiwgbml0cmF0ZWJhbGxaKSkKCiMgMTk1MC0wOS0yMCAxMjo0NTowMCwgMTUuMAojIEFyYml0cmFyeSBkYXRlIDIsIGFib3ZlIDYuMTAwOTM0IGFuZCByZXR1cm5zIDAuNTU2MTM4LiAKbml0cmF0ZWJhbGxaIDwtICgxNS4wIC0gbml0cmF0ZW1lYW4pL25pdHJhdGVzZApwcmludChwYXN0ZSgiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIDE1LjA6ICIsIG5pdHJhdGViYWxsWikpCgojIDIwMDUtMDMtMTUgMTE6MjA6MDAsIDAuODAKIyBBcmJpdHJhcnkgZGF0ZSAzLCBiZWxsb3cgdGhlIG1lYW4gdGhhdCByZXR1cm5zIC0wLjMzMTI3NjQKbml0cmF0ZWJhbGxaIDwtICgwLjgwIC0gbml0cmF0ZW1lYW4pL25pdHJhdGVzZApwcmludChwYXN0ZSgiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIDAuODA6ICIsIG5pdHJhdGViYWxsWikpCgojIEFuZCBhIHplcm8gdmFsdWUganVzdCB0byBzZWU6IC0wLjM4MTI3MTYuCm5pdHJhdGViYWxsWiA8LSAoMCAtIG5pdHJhdGVtZWFuKS9uaXRyYXRlc2QKcHJpbnQocGFzdGUoIlRoZSB6LXNjb3JlIHdpdGggYSB2YWx1ZSBvZiB6ZXJvOiAiLCBuaXRyYXRlYmFsbFopKQoKIyBXaGF0IGFib3V0IG5lZ2F0aXZlIG5pdHJhdGVzPwpuaXRyYXRlYmFsbFogPC0gKC0yIC0gbml0cmF0ZW1lYW4pL25pdHJhdGVzZApwcmludChwYXN0ZSgiVGhlIHotc2NvcmUgd2l0aCBhIHZhbHVlIG9mIC0yOiAiLCBuaXRyYXRlYmFsbFopKQpgYGA=</div>
 
 
 
