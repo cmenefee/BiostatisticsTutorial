@@ -1,0 +1,102 @@
+---
+title: "Module 6 - Describing Data: Probability Sections 1 and 2"
+output: html_notebook
+---
+
+# Probability II
+Probably.
+-   Using sample data as a basis to answer questions about a population.
+-   Relates samples and populations through populations and proportions.
+-   Probability -\> propotion of outcome
+
+$$
+\textrm{probability of A} = \frac{\textrm{number of outcomes clased as A}}{\textrm{total number of outcomes}}
+$$
+
+Which means I need a dataset with a population.
+```{r}
+# Load the PostgreSQL driver, create a connection to the postgres database
+require("RPostgreSQL")
+drv <- dbDriver("PostgreSQL")
+con <- dbConnect(drv, dbname = "covertype", host = "localhost", port = 5432, user = "ruser", password = "ruser")
+sql_string <- paste("SELECT * FROM covertype", sep="")
+covertype <- data.frame(dbGetQuery(con, sql_string))
+dbDisconnect(con)
+rm(con)
+```
+
+# Probability and porportions
+
+So let's find the probability of one tree type being 'selected'
+```{r}
+Area_Subset <- subset(covertype, covertype$wilderness_area4=="TRUE")
+uniquetypes <- unique(covertype$cover_type)
+treecount <- c(table(sort(covertype$cover_type)))
+
+for(i in uniquetypes)
+  {
+      print(paste("Probability of selecting CoverType", i, " from Wilderness_Area4 is: ", (sum(treecount[i])/sum(treecount[1:7]))*100, sep=""))
+  }
+```
+
+Frequency Graphs:
+```{r}
+Area_Subset <- subset(covertype, covertype$wilderness_area4=="TRUE")
+uniquetypes <- unique(covertype$cover_type)
+treecount <- c(table(covertype$cover_type))
+percentages <- c()
+options(warn=-1)
+
+for(i in sort(uniquetypes))
+  {
+    percentages <- append(percentages, sum(treecount[i])/sum(treecount[1:7])*100)
+  }
+
+par(mfrow=c(1,2))
+barplot(treecount, main = "Simple Frequency")
+barplot(percentages, main = "Probability Frequency?")
+
+par(mfrow=c(2,2))
+plot(dnorm(percentages), type = "l")
+plot(pnorm(percentages), type = "l")
+plot(qnorm(percentages), type = "l")
+plot(rnorm(percentages), type = "l")
+
+# Or should that be counts?
+par(mfrow=c(1,1))
+plot(rnorm(treecount), type = "l")
+
+# If so only rnorm works for treecount and rnorm: "....is used to generate random numbers whose distribution is normal. It takes the sample size as input and generates that many random numbers. We draw a histogram to show the distribution of the generated numbers...."
+# Making dnorm the only one that looks like the classic 'normal distribution'.
+# But this all feels like incorrect categories...These are all counts and not values. What's the standard deviation for "yes" or "no"? That doesn't seem right. 
+options(warn=0)
+``` 
+CoverType
+1 - Spruce/Fir
+2 - Lodgepole Pine
+3 - Ponderosa Pine
+4 - Cottonwood/Willow
+5 - Aspen
+6 - Douglas-fir
+7 - Krummholz
+
+WildernessArea
+1 - Rawah Wilderness Area
+2 - Neota Wilderness Area
+3 - Comanche Peak Wilderness Area
+4 - Cache la Poudre Wilderness Area
+
+# Notations and Random Sampling
+  Expressed as fractions, decimals, or percentages. 
+
+# The Unit Normal Table
+  - Gives the probability that a standard normal random variable Z is less than any given number z. 
+  - Used to find the probability that a statistic is observed below, above, or between values on the standard normal distribution, and by extension, any normal distribution.
+    
+# Probability II
+    
+# The Binomial Distribution
+
+# Multiplication and Addition Rules
+
+
