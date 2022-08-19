@@ -4,16 +4,15 @@ output: html_notebook
 ---
 
 # Probability II
-Probably.
--   Using sample data as a basis to answer questions about a population.
--   Relates samples and populations through populations and proportions.
--   Probability -\> propotion of outcome
+
+Probably. - Using sample data as a basis to answer questions about a population. - Relates samples and populations through populations and proportions. - Probability -\> propotion of outcome
 
 $$
 \textrm{probability of A} = \frac{\textrm{number of outcomes clased as A}}{\textrm{total number of outcomes}}
 $$
 
 Which means I need a dataset with a population.
+
 ```{r}
 # Load the PostgreSQL driver, create a connection to the postgres database
 require("RPostgreSQL")
@@ -28,6 +27,7 @@ rm(con)
 # Probability and porportions
 
 So let's find the probability of one tree type being 'selected'
+
 ```{r}
 Area_Subset <- subset(covertype, covertype$wilderness_area4=="TRUE")
 uniquetypes <- unique(covertype$cover_type)
@@ -40,6 +40,7 @@ for(i in uniquetypes)
 ```
 
 Frequency Graphs:
+
 ```{r}
 Area_Subset <- subset(covertype, covertype$wilderness_area4=="TRUE")
 uniquetypes <- unique(covertype$cover_type)
@@ -70,33 +71,109 @@ plot(rnorm(treecount), type = "l")
 # Making dnorm the only one that looks like the classic 'normal distribution'.
 # But this all feels like incorrect categories...These are all counts and not values. What's the standard deviation for "yes" or "no"? That doesn't seem right. 
 options(warn=0)
-``` 
-CoverType
-1 - Spruce/Fir
-2 - Lodgepole Pine
-3 - Ponderosa Pine
-4 - Cottonwood/Willow
-5 - Aspen
-6 - Douglas-fir
-7 - Krummholz
+```
 
-WildernessArea
-1 - Rawah Wilderness Area
-2 - Neota Wilderness Area
-3 - Comanche Peak Wilderness Area
-4 - Cache la Poudre Wilderness Area
+CoverType
+
+1.  Spruce/Fir
+
+2.  Lodgepole Pine
+
+3.  Ponderosa Pine
+
+4.  Cottonwood/Willow
+
+5.  Aspen
+
+6.  Douglas-fir
+
+7.  Krummholz
+
+Wilderness area name:
+
+1.  Rawah
+
+2.  Neota
+
+3.  Comanche Peak
+
+4.  Cache la Poudre Wilderness Area
 
 # Notations and Random Sampling
-  Expressed as fractions, decimals, or percentages. 
+
+Expressed as fractions, decimals, or percentages.
 
 # The Unit Normal Table
-  - Gives the probability that a standard normal random variable Z is less than any given number z. 
-  - Used to find the probability that a statistic is observed below, above, or between values on the standard normal distribution, and by extension, any normal distribution.
-    
+
+-   Gives the probability that a standard normal random variable Z is less than any given number z.
+-   Used to find the probability that a statistic is observed below, above, or between values on the standard normal distribution, and by extension, any normal distribution.
+
 # Probability II
-    
+
 # The Binomial Distribution
 
+-   When a variable is measured in a scale of two categories the resulting data is termed 'binomial'.
+-   Off on, yes no.
+
+**dbinom** (probability): returns the value of the probability density function
+
+    dbinom(x,             # X-axis values (x = 0, 1, 2, ..., n)
+         size,            # Number of trials (n > = 0)
+         prob,            # The probability of success on each trial
+         log = FALSE)     # If TRUE, probabilities are given as log
+
+```{r}
+#So how does this fit in with the trees?
+treecount <- c(table(sort(covertype$cover_type)))
+chance <- (sum(treecount[2])/sum(treecount[1:7]))
+dbi<-dbinom(x = 1000:2000, size = treecount, prob = chance)
+
+plot(dbi, type = "h", lwd = 1,     
+     main = "Ranged 1000 to 2000, how likely are you to have x covertype? \n dbinom()",
+     ylab = "P(X = x)", xlab = "X number of trees")
+
+FileDirectory <- paste("/home/daiten/Programming/R/Projects/Biostatistics Tutorial/Media/", sep="")
+png(paste(FileDirectory, "TreeProbability.jpg", sep = ""), width = 1000, height = 500)
+plot(dbi, type = "h", lwd = 1,     
+     main = "Ranged 1000 to 2000, how likely are you to have x covertype? \n dbinom()",
+     ylab = "P(X = x)", xlab = "X number of trees")
+dev.off()
+```
+
+-   Employing dbinom() Finds the probability of getting a certain number of (x) in a certain sample of (size) where (prob) of success on each trial is fixed
+-   So, I should be able to graph this: "Probability of selecting X CoverType2s from Wilderness_Area4 with a chance of 48.7599223423957%"
+-   Binomial probability mass function (Probability function)
+-   When we are interested in knowing the probability of exactly x successes in n trials that has a probability of success, p, on each trial.
+
+**pbinom** (distribution): returns the value of the cumulative density function
+
+    pbinom(q,             # Quantile or vector of quantiles
+       size,              # Number of trials (n > = 0)
+       prob,              # The probability of success on each trial
+       lower.tail = TRUE, # If TRUE, probabilities are P(X <= x), or P(X > x) otherwise
+       log.p = FALSE)     # If TRUE, probabilities are given as log
+
+-   Returns the area to the left of a (q) in the binomial distribution.
+-   Binomial distribution (Cumulative distribution function)
+
+**qbinom** (quantile): returns the value of the inverse cumulative density function - Binomial quantile function
+
+    qbinom(p,                 # Probability or vector of probabilities
+           size,              # Number of trials (n > = 0)
+           prob,              # The probability of success on each trial
+           lower.tail = TRUE, # If TRUE, probabilities are P(X <= x), or P(X > x) otherwise
+           log.p = FALSE)     # If TRUE, probabilities are given as log
+
+-   Given a probability or a set of probabilities, obtains the corresponding binomial quantile.
+-   Find the pth quantile of a binomial distribution.
+
+**rbinom** (random) - function allows drawing nn random samples from a binomial distribution in R. - Binomial pseudorandom number generation
+
+    rbinom(n,    # Number of random observations to be generated
+           size, # Number of trials (> = 0)
+           prob) # The probability of success on each trial
+
+-   generates a vector of binomial distributed random variables given a vector length n, number of trials (size) and probability of success on each trial (prob).
+-   draw nn random observations from a binomial distribution in R.
+
 # Multiplication and Addition Rules
-
-
